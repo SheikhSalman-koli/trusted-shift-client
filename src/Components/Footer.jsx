@@ -3,7 +3,7 @@ import TrustedLogo from './TrustedLogo';
 
 const Footer = () => {
     return (
-        <footer className="footer footer-horizontal footer-center bg-neutral text-neutral-content p-10">
+        <footer className="footer footer-horizontal footer-center bg-neutral text-neutral-content p-10 mt-10">
             <aside>
                  <TrustedLogo></TrustedLogo>
                 <p className="font-bold">

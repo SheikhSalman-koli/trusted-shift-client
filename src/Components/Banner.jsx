@@ -11,6 +11,7 @@ const Banner = () => {
             <Carousel
                 autoPlay={true}
                 infiniteLoop={true}
+                showThumbs={false}
             >
                 <div>
                     <img src={img1} />
