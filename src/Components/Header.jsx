@@ -1,15 +1,27 @@
-import React from 'react';
+import React, { use } from 'react';
 import { NavLink } from 'react-router';
 import TrustedLogo from './TrustedLogo';
+import { AuthContext } from '../Context/AuthContext';
 
 const Header = () => {
 
+    const{logout} = use(AuthContext)
+
+    const handleLogOut =()=>{
+        logout()
+         .then(()=>{
+            alert('logged out successful')
+         }).catch(err=>{
+            console.log(err);
+         })
+    }
+
     const links = <>
         <li><NavLink to='/'>Home</NavLink></li>
+        <li><NavLink to='/coverage'>Coverage</NavLink></li>
         <li><NavLink to='/about'>About Us</NavLink></li>
         
     </>
-
     return (
         <div className="navbar bg-base-100 shadow-sm mb-10">
             <div className="navbar-start">
@@ -33,7 +45,7 @@ const Header = () => {
                 </ul>
             </div>
             <div className="navbar-end">
-                <a className="btn">Button</a>
+                <button onClick={handleLogOut}>LogOut</button>
             </div>
         </div>
     );
