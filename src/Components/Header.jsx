@@ -1,11 +1,11 @@
 import React, { use } from 'react';
-import { NavLink } from 'react-router';
+import { Link, NavLink } from 'react-router';
 import TrustedLogo from './TrustedLogo';
 import { AuthContext } from '../Context/AuthContext';
 
 const Header = () => {
 
-    const{logout} = use(AuthContext)
+    const{logout, user} = use(AuthContext)
 
     const handleLogOut =()=>{
         logout()
@@ -18,6 +18,7 @@ const Header = () => {
 
     const links = <>
         <li><NavLink to='/'>Home</NavLink></li>
+        <li><NavLink to='/sendparcel'>Add Parcel</NavLink></li>
         <li><NavLink to='/coverage'>Coverage</NavLink></li>
         <li><NavLink to='/about'>About Us</NavLink></li>
         
@@ -35,9 +36,9 @@ const Header = () => {
                             {links}
                     </ul>
                 </div>
-                <a className="btn btn-ghost text-xl">
+                <button className="btn btn-ghost text-xl">
                     <TrustedLogo></TrustedLogo>
-                </a>
+                </button>
             </div>
             <div className="navbar-center hidden lg:flex">
                 <ul className="menu menu-horizontal px-1">
@@ -45,7 +46,12 @@ const Header = () => {
                 </ul>
             </div>
             <div className="navbar-end">
-                <button onClick={handleLogOut}>LogOut</button>
+            {
+                user ? (<button onClick={handleLogOut}>LogOut</button>)
+                :
+                (<Link to='/login'>Login</Link>)
+            }
+                
             </div>
         </div>
     );

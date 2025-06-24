@@ -11,6 +11,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useLoaderData } from "react-router";
 
+
 // Fix missing marker icons in Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -42,7 +43,7 @@ L.Icon.Default.mergeOptions({
 export default function Coverage() {
 
   const branches = useLoaderData()
-  console.log(branches);
+  // console.log(branches);
 
   const [searchTerm, setSearchTerm] = useState("");
 

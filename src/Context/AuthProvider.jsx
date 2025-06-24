@@ -29,11 +29,13 @@ const AuthProvider = ({ children }) => {
         }
     },[])
 
-
+    const test = 'is okokoko?'
 
     const AuthInfo = {
         signInWithGoogle,
-        logout
+        logout,
+        user,
+        test
     }
 
     return (
