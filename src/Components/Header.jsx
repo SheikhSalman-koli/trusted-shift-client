@@ -2,6 +2,7 @@ import React, { use } from 'react';
 import { Link, NavLink } from 'react-router';
 import TrustedLogo from './TrustedLogo';
 import { AuthContext } from '../Context/AuthContext';
+import Swal from 'sweetalert2';
 
 const Header = () => {
 
@@ -10,7 +11,7 @@ const Header = () => {
     const handleLogOut = () => {
         logout()
             .then(() => {
-                alert('logged out successful')
+                Swal.fire('logged out successful')
             }).catch(err => {
                 console.log(err);
             })

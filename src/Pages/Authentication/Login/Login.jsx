@@ -2,15 +2,19 @@ import React, { use, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaEyeSlash } from 'react-icons/fa';
 import { MdRemoveRedEye } from 'react-icons/md';
-import { AuthContext } from '../../../Context/AuthContext';
 import SocialLogin from '../SocialLogin';
-import { Link } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
+import UseAuth from '../../../Context/Hook/UseAuth';
+import toast from 'react-hot-toast';
 
 
 const Login = () => {
 
-    // const {test} = use(AuthContext)
-    // console.log(test);
+    const {signInUser} = UseAuth()
+    const location = useLocation()
+    const navigate = useNavigate()
+    const from = location.state || '/'
+    // console.log(location,from);
 
     const { 
         register,
@@ -20,17 +24,30 @@ const Login = () => {
 
     const [showPAssword, setShowPassword] = useState(false)
 
-    const data = info => {
-        console.log(info);
+    const onSubmit = data => {
+        const email = data.email
+        const password = data.password
+
+        signInUser(email, password)
+        .then(result=>{
+            // console.log(result.user);
+            if(result.user){
+                toast.success('user logged in successfully!')
+            }
+            navigate(from)
+        }).catch(err=>{
+            toast.error(err.message)
+        })
     }
 
     const handleShowPassword = () => {
         setShowPassword(!showPAssword)
     }
 
+
     return (
         <div>
-            <form onSubmit={handleSubmit(data)}>
+            <form onSubmit={handleSubmit(onSubmit)}>
                 <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
              <h1 className="text-3xl font-bold">Login Now!</h1>
 

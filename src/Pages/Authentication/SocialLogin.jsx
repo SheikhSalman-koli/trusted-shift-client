@@ -1,6 +1,6 @@
 import React, { use } from 'react';
 import { AuthContext } from '../../Context/AuthContext';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import toast from 'react-hot-toast';
 
 
@@ -8,12 +8,15 @@ const SocialLogin = () => {
 
     const {signInWithGoogle} = use(AuthContext)
 
-    const Navigate = useNavigate()
+    const location = useLocation()
+    const navigate = useNavigate()
+    const from = location.state || '/'
+
 
     const handleSignInWithGoogle =()=>{
         signInWithGoogle()
         .then(result=>{
-            Navigate('/')
+            navigate(from)
             if(result){
                 toast.success('logged in successfully')
             }
