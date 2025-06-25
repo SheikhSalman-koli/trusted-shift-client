@@ -2,10 +2,24 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useLoaderData } from "react-router";
+import UseAuth from '../../Context/Hook/UseAuth'
+import Swal from "sweetalert2";
+import axios from "axios";
+import UseAxiosSecure from "../../Context/Hook/UseAxiosSecure";
 
+const generateTrackingId = () => {
+    const prefix = "TRK";
+    const timestamp = Date.now().toString().slice(-6); // last 6 digits of current time
+    const random = Math.floor(1000 + Math.random() * 9000); // random 4-digit number
+    return `${prefix}-${timestamp}-${random}`;
+};
 
 
 const AddParcelForm = () => {
+
+    const { user } = UseAuth();
+    const axiosSecure = UseAxiosSecure()
+
     const {
         register,
         handleSubmit,
@@ -42,7 +56,6 @@ const AddParcelForm = () => {
         if (isDocument) {
             return isSameRegion ? 60 : 80;
         }
-
         // Non-document logic
         if (weight <= 3) {
             return isSameRegion ? 110 : 150;
@@ -58,61 +71,114 @@ const AddParcelForm = () => {
         }
     };
 
-
     const confirmAndSave = async (data, cost) => {
         const payload = {
             ...data,
             deliveryCost: cost,
+            created_by: user?.email,
+            payment_status: 'unpaid',
+            delivery_status: 'not-collected',
             creation_date: new Date().toISOString(),
+            trackingId: generateTrackingId()
         };
-        console.log(payload);
-        toast.success("Parcel saved successfully!");
-        // try {
-        //   const res = await fetch("https://your-api-endpoint.com/parcels", {
-        //     method: "POST",
-        //     headers: { "Content-Type": "application/json" },
-        //     body: JSON.stringify(payload),
-        //   });
+        // console.log(payload);
 
-        //   if (res.ok) {
-        //     toast.success("Parcel saved successfully!");
-        //     reset();
-        //     setSenderRegion("");
-        //     setReceiverRegion("");
-        //   } else {
-        //     toast.error("Failed to save parcel.");
-        //   }
-        // } catch (err) {
-        //   toast.error("An error occurred.");
-        // }
+        axiosSecure.post('/parcels', payload)
+            .then((res) => {
+                if (res.data.insertedId) {
+                    // TODO: redirect to ----
+                    toast.success('your parcel has been approved successfully!')
+                    console.log(res.data);
+                } 
+            })
+            .catch((err) => {
+                toast.error(err.message)
+            });
     };
 
+    {/* submit with toast */ }
+    // const onSubmit = (data) => {
+    //     const cost = calculateDeliveryCost(data);
+    //     toast((t) => (
+    //         <div className="bg-white shadow-lg rounded p-4 border">
+    //             <p className="text-lg font-semibold">Delivery Cost: ৳{cost}</p>
+    //             <div className="flex items-center justify-between mt-4">
+    //                 <button
+    //                     onClick={() => {
+    //                         toast.dismiss(t.id);
+    //                         confirmAndSave(data, cost);
+    //                     }}
+    //                     className="btn btn-sm btn-success"
+    //                 >
+    //                     Confirm
+    //                 </button>
+    //                 <button
+    //                     onClick={() => toast.dismiss(t.id)} // ✅ close without saving
+    //                     className="btn btn-sm btn-outline"
+    //                 >
+    //                     Cancel
+    //                 </button>
+    //             </div>
+    //         </div>
+    //     ), { duration: Infinity });
+    // };
+
+    {/*submit with sweet alert2*/ }
     const onSubmit = (data) => {
         const cost = calculateDeliveryCost(data);
-        toast((t) => (
-            <div className="bg-white shadow-lg rounded p-4 border">
-                <p className="text-lg font-semibold">Delivery Cost: ৳{cost}</p>
-                <div className="flex items-center justify-between mt-4">
-                    <button
-                        onClick={() => {
-                            toast.dismiss(t.id);
-                            confirmAndSave(data, cost);
-                        }}
-                        className="btn btn-sm btn-success"
-                    >
-                        Confirm
-                    </button>
+        const trackingId = generateTrackingId();
+        const weight = parseFloat(data.weight || 0);
+        const isSameRegion = data.senderRegion === data.receiverRegion;
+        const type = data.type;
 
-                    <button
-                        onClick={() => toast.dismiss(t.id)} // ✅ close without saving
-                        className="btn btn-sm btn-outline"
-                    >
-                        Cancel
-                    </button>
-                </div>
-            </div>
-        ), { duration: Infinity });
+        // Build breakdown
+        let breakdown = '';
+        if (type === 'document') {
+            breakdown = isSameRegion
+                ? 'Base Rate (Document, Same City): ৳60'
+                : 'Base Rate (Document, Outside City): ৳80';
+        } else {
+            if (weight <= 3) {
+                breakdown = isSameRegion
+                    ? 'Base Rate (Non-Document ≤ 3kg, Same City): ৳110'
+                    : 'Base Rate (Non-Document ≤ 3kg, Outside City): ৳150';
+            } else {
+                const extraKg = weight - 3;
+                const extraCost = 40 * extraKg;
+                breakdown = isSameRegion
+                    ? `Base Rate: ৳110\nExtra Weight (${extraKg}kg × ৳40): ৳${extraCost}`
+                    : `Base Rate: ৳150\nExtra Weight (${extraKg}kg × ৳40): ৳${extraCost}\nAdditional Fee (Outside City): ৳40`;
+            }
+        }
+
+        // Show SweetAlert2 confirmation
+        Swal.fire({
+            title: `Delivery Cost: ৳${cost}`,
+            html: `
+      <div style="text-align: left;">
+        <strong>Tracking ID:</strong> ${trackingId}<br/><br/>
+        <pre style="text-align: left; background:#f9f9f9; padding:10px; border-radius:6px; font-size:14px;">${breakdown}</pre>
+      </div>
+    `,
+            showCancelButton: true,
+            confirmButtonText: 'Confirm',
+            cancelButtonText: 'Cancel',
+            icon: 'info',
+            customClass: {
+                popup: 'max-w-lg'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Swal.fire({
+                //     title: "saved!",
+                //     text: "Your parcel has been saved.",
+                //     icon: "success"
+                // });
+                confirmAndSave({ ...data, trackingId }, cost);
+            }
+        });
     };
+
 
     return (
         <div className="max-w-5xl mx-auto p-6">
@@ -164,7 +230,7 @@ const AddParcelForm = () => {
                             <input type="hidden" {...register("receiverRegion", { required: true })} />
                             <input type="hidden" {...register("receiverServiceCenter", { required: true })} />
 
-                            <input className="input input-bordered w-full" defaultValue={userName} {...register("senderName", { required: true })} />
+                            <input className="input input-bordered w-full" placeholder={user?.displayName} {...register("senderName", { required: true })} />
                             <input className="input input-bordered w-full" placeholder="Sender Contact" {...register("senderContact", { required: true })} />
 
                             <select className="select select-bordered w-full" value={senderRegion} onChange={(e) => {

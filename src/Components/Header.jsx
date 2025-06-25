@@ -5,15 +5,15 @@ import { AuthContext } from '../Context/AuthContext';
 
 const Header = () => {
 
-    const{logout, user} = use(AuthContext)
+    const { logout, user } = use(AuthContext)
 
-    const handleLogOut =()=>{
+    const handleLogOut = () => {
         logout()
-         .then(()=>{
-            alert('logged out successful')
-         }).catch(err=>{
-            console.log(err);
-         })
+            .then(() => {
+                alert('logged out successful')
+            }).catch(err => {
+                console.log(err);
+            })
     }
 
     const links = <>
@@ -21,7 +21,7 @@ const Header = () => {
         <li><NavLink to='/sendparcel'>Add Parcel</NavLink></li>
         <li><NavLink to='/coverage'>Coverage</NavLink></li>
         <li><NavLink to='/about'>About Us</NavLink></li>
-        
+
     </>
     return (
         <div className="navbar bg-base-100 shadow-sm mb-10">
@@ -33,7 +33,7 @@ const Header = () => {
                     <ul
                         tabIndex={0}
                         className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-                            {links}
+                        {links}
                     </ul>
                 </div>
                 <button className="btn btn-ghost text-xl">
@@ -46,12 +46,15 @@ const Header = () => {
                 </ul>
             </div>
             <div className="navbar-end">
-            {
-                user ? (<button onClick={handleLogOut}>LogOut</button>)
-                :
-                (<Link to='/login'>Login</Link>)
-            }
-                
+                {
+                    user ? <>
+                        <Link className='mr-4' to='/dashboard'>Dashboard</Link>
+                        <button onClick={handleLogOut}>Logout</button>
+                    </>
+                        :
+                        (<Link to='/login'>Login</Link>)
+                }
+
             </div>
         </div>
     );

@@ -1,6 +1,8 @@
 import React, { use } from 'react';
 import { AuthContext } from '../../Context/AuthContext';
 import { useNavigate } from 'react-router';
+import toast from 'react-hot-toast';
+
 
 const SocialLogin = () => {
 
@@ -12,9 +14,11 @@ const SocialLogin = () => {
         signInWithGoogle()
         .then(result=>{
             Navigate('/')
-            console.log(result.user);
+            if(result){
+                toast.success('logged in successfully')
+            }
         }).catch(error=>{
-            console.log(error);
+            toast.error(error.message)
         })
     }
 
