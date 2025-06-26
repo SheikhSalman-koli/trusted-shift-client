@@ -4,10 +4,12 @@ import UseAuth from '../../../Context/Hook/UseAuth';
 import UseAxiosSecure from '../../../Context/Hook/UseAxiosSecure';
 import ParcelTable from './ParcelTable';
 import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router';
 
 const MyParcel = () => {
 
     const { user } = UseAuth()
+    const navigate = useNavigate()
     const axiosSecure = UseAxiosSecure()
 
     const { data: parcels = [], refetch } = useQuery({
@@ -18,8 +20,12 @@ const MyParcel = () => {
         }
     })
 
-    console.log(parcels);
+    // console.log(parcels);
 
+    const handlePayment = (id) => {
+        // console.log(id);
+        navigate(`/dashboard/payment/${id}`)
+    }
 
     const handleDelete = (id) => {
         Swal.fire({
@@ -62,7 +68,7 @@ const MyParcel = () => {
             <ParcelTable
                 parcels={parcels}
                 onView={(parcel) => console.log('View', parcel)}
-                onPay={(parcel) => console.log('Pay', parcel)}
+                onPay={handlePayment}
                 onDelete={handleDelete}
             />
 

@@ -41,7 +41,7 @@ const ParcelTable = ({ parcels = [], onView, onPay, onDelete }) => {
                 </button>
                 <button
                   className="btn btn-xs btn-outline btn-success"
-                  onClick={() => onPay(parcel)}
+                  onClick={() => onPay(parcel._id)}
                 >
                   Pay
                 </button>
