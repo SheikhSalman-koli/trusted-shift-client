@@ -1,6 +1,12 @@
 import React from 'react';
+import { AiFillHome } from 'react-icons/ai';
+import { FiPackage } from 'react-icons/fi';
+import { BsClockHistory } from 'react-icons/bs';
+import { MdTrackChanges } from 'react-icons/md';
+import { FaUserEdit } from 'react-icons/fa';
 import { NavLink, Outlet } from 'react-router';
 import TrustedLogo from '../Components/TrustedLogo';
+import './Dashboard.css'
 
 const DashBoardLayout = () => {
     return (
@@ -32,15 +38,38 @@ const DashBoardLayout = () => {
                 {/* Page content here */}
                 <Outlet></Outlet>
             </div>
-            
+
 
             <div className="drawer-side">
                 <label htmlFor="my-drawer-2" aria-label="close sidebar" className="drawer-overlay"></label>
                 <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4">
                     {/* Sidebar content here */}
                     <TrustedLogo></TrustedLogo>
-                    <li><NavLink to='/dashboard'>Home</NavLink></li>
-                    <li><NavLink to='/dashboard/myparcel'>My PArcels</NavLink></li>
+                    <li>
+                        <NavLink to="/dashboard">
+                            <AiFillHome className="inline mr-2" /> Home
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink to="/dashboard/myparcel">
+                            <FiPackage className="inline mr-2" /> My Parcels
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink to="/dashboard/history">
+                            <BsClockHistory className="inline mr-2" /> Payment History
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink to="/dashboard/track">
+                            <MdTrackChanges className="inline mr-2" /> Track
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink to="/dashboard/profile">
+                            <FaUserEdit className="inline mr-2" /> Update Profile
+                        </NavLink>
+                    </li>
                 </ul>
             </div>
 

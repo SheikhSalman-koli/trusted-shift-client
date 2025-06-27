@@ -40,7 +40,8 @@ const ParcelTable = ({ parcels = [], onView, onPay, onDelete }) => {
                   View
                 </button>
                 <button
-                  className="btn btn-xs btn-outline btn-success"
+                  disabled={parcel.payment_status === 'paid'}
+                  className={`btn btn-xs btn-outline btn-success`}
                   onClick={() => onPay(parcel._id)}
                 >
                   Pay
@@ -49,7 +50,7 @@ const ParcelTable = ({ parcels = [], onView, onPay, onDelete }) => {
                   className="btn btn-xs btn-outline btn-error"
                   onClick={() => onDelete(parcel._id)}
                 >
-                  Delete
+                  Cancel
                 </button>
               </td>
             </tr>

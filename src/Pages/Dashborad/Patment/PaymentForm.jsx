@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import UseAxiosSecure from '../../../Context/Hook/UseAxiosSecure';
 import UseAuth from '../../../Context/Hook/UseAuth';
+import Swal from 'sweetalert2';
 
 const PaymentForm = () => {
     const stripe = useStripe()
@@ -12,7 +13,8 @@ const PaymentForm = () => {
     const [error, setError] = useState('')
     const { parcelId } = useParams()
     // console.log(parcelId);
-    const {user} = UseAuth()
+    const { user } = UseAuth()
+    const navigate = useNavigate()
     const axiosSecure = UseAxiosSecure()
 
     const { isPending, data: parcelInfo = {} } = useQuery({
@@ -50,7 +52,6 @@ const PaymentForm = () => {
         }
 
         // Use your card Element with other Stripe.js APIs
-
         const { error, paymentMethod } = await stripe.createPaymentMethod({
             type: 'card',
             card
@@ -86,11 +87,43 @@ const PaymentForm = () => {
             } else {
                 setError('')
                 if (result.paymentIntent.status === 'succeeded') {
-                console.log('Payment succeeded');
-                console.log(result);
-                // step-4: mark parcel paid also create payment history
+                    // console.log('Payment succeeded');
+                    const transactionId = result.paymentIntent.id
+                    // step-4: mark parcel paid also create payment history
+
+                    const paymentData = {
+                        parcelId,
+                        amount: priceInCents,
+                        transactionId: transactionId,
+                        paidBy: user.email
+                    }
+
+                    const paymentRes = await axiosSecure.post('/payments', paymentData)
+
+                    if (paymentRes.data.paymentId) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Payment Successful!',
+                            html: `
+                              <p class="text-base">Transaction ID:</p>
+                              <p class="text-sm font-mono bg-gray-100 p-2 rounded text-gray-700">${transactionId}</p>
+                              <br/>
+                              <button id="go-to-parcels" class="swal2-confirm swal2-styled bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+                                Go to My Parcels
+                              </button>
+                            `,
+                            showConfirmButton: false,
+                            didOpen: () => {
+                                const btn = Swal.getPopup().querySelector('#go-to-parcels');
+                                btn.addEventListener('click', () => {
+                                    Swal.close();
+                                    navigate('/dashboard/myparcel'); // redirect to your page
+                                });
+                            },
+                        });
+                    }
+                }
             }
-        }
 
         }
 
