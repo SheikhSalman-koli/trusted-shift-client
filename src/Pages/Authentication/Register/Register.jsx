@@ -1,11 +1,13 @@
-import React, { use } from 'react';
+import React, { use, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useLocation, useNavigate } from 'react-router';
 import UseAuth from '../../../Context/Hook/UseAuth';
 import Swal from 'sweetalert2';
+import axios from 'axios';
 
 const Register = () => {
     const { createUser, updateUser } = UseAuth()
+    const [profile, setProfile] = useState('')
 
     const location = useLocation()
     const navigate = useNavigate()
@@ -17,13 +19,18 @@ const Register = () => {
         const email = info.email
         const password = info.password
         const name = info.name
-        const photo = info.photo
+        const photo = profile
 
         createUser(email, password)
             .then(result => {
                 const emailHolder = result.user
-                updateUser({ ...emailHolder, displayName: name, photoURL: photo })
-                    .then(() => {
+                const updatedfile = {
+                    ...emailHolder,
+                    displayName: name,
+                    photoURL: photo
+                }
+                updateUser(updatedfile)
+                .then(() => {
                         Swal.fire({
                             position: "top-end",
                             icon: "success",
@@ -35,11 +42,22 @@ const Register = () => {
                     }).catch(error => {
                         console.log(error);
                     })
-                // console.log(emailHolder);
+
             }).catch(error => {
                 console.log(error);
             })
 
+    }
+
+    const handleUpload =async e =>{
+        e.preventDefault()
+        const photo = e.target.files[0]
+        // console.log(photo);
+        const formData = new FormData()
+        formData.append('image', photo)
+        console.log(formData);
+        const res =await axios.post(`https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_API_KEY}`,formData)
+        setProfile(res.data.data.display_url);
     }
 
     return (
@@ -83,10 +101,11 @@ const Register = () => {
 
                     <label className='label'>Photo</label>
                     <input
-                        {...register('photo')}
-                        type="text"
-                        className='input'
-                        placeholder='Photo_url' />
+                        onChange={handleUpload}
+                        type="file"
+                        accept="image/*"
+                        className='file-input file-input-bordered'
+                        placeholder='drag your photo here' />
 
                     <button type='submit' className="btn btn-primary text-black mt-4">Register</button>
 

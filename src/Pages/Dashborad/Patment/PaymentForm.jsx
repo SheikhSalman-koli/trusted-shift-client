@@ -7,9 +7,7 @@ import UseAuth from '../../../Context/Hook/UseAuth';
 import Swal from 'sweetalert2';
 
 const PaymentForm = () => {
-    const stripe = useStripe()
-    const elements = useElements()
-
+   
     const [error, setError] = useState('')
     const { parcelId } = useParams()
     // console.log(parcelId);
@@ -24,14 +22,17 @@ const PaymentForm = () => {
             return res.data
         }
     })
+    // console.log(parcelInfo);
 
-    console.log(parcelInfo);
     if (isPending) {
         return <span className="loading loading-dots loading-xl"></span>
     }
 
     const price = parcelInfo.deliveryCost;
     const priceInCents = price * 100;
+
+     const stripe = useStripe()
+    const elements = useElements()
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -52,6 +53,7 @@ const PaymentForm = () => {
         }
 
         // Use your card Element with other Stripe.js APIs
+        // 1- validate the card
         const { error, paymentMethod } = await stripe.createPaymentMethod({
             type: 'card',
             card
@@ -64,6 +66,7 @@ const PaymentForm = () => {
             setError('')
             console.log('payment method', paymentMethod);
 
+            // 2- create payment intent
             const res = await axiosSecure.post('/create-payment-intent', {
                 priceInCents,
                 parcelId
