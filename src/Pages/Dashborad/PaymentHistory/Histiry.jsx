@@ -20,7 +20,7 @@ const Histiry = () => {
         return <span className="loading loading-dots loading-xl"></span>
     }
 
-    console.log(paymentHistory);
+    // console.log(paymentHistory);
 
     return (
         <div>

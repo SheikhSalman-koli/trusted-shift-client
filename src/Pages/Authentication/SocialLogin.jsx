@@ -2,11 +2,13 @@ import React, { use } from 'react';
 import { AuthContext } from '../../Context/AuthContext';
 import { useLocation, useNavigate } from 'react-router';
 import toast from 'react-hot-toast';
+import useAxios from '../../Context/Hook/useAxios';
 
 
 const SocialLogin = () => {
 
     const {signInWithGoogle} = use(AuthContext)
+    const axiosInstance = useAxios()
 
     const location = useLocation()
     const navigate = useNavigate()
@@ -15,11 +17,24 @@ const SocialLogin = () => {
 
     const handleSignInWithGoogle =()=>{
         signInWithGoogle()
-        .then(result=>{
+        .then(async (result)=>{
             navigate(from)
             if(result){
                 toast.success('logged in successfully')
             }
+
+            const userEmail = result.user.email
+
+              const userInfo = {
+                    email: userEmail,
+                    role: 'user',
+                    created_at: new Date().toISOString(),
+                    last_log_at: new Date().toISOString()
+                }
+
+              const userRes =await axiosInstance.post('/users',userInfo)  
+              console.log(userRes.data);
+
         }).catch(error=>{
             toast.error(error.message)
         })

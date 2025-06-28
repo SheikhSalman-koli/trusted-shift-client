@@ -2,8 +2,8 @@ import React from 'react';
 import { AiFillHome } from 'react-icons/ai';
 import { FiPackage } from 'react-icons/fi';
 import { BsClockHistory } from 'react-icons/bs';
-import { MdTrackChanges } from 'react-icons/md';
-import { FaUserEdit } from 'react-icons/fa';
+import { MdPendingActions, MdTrackChanges } from 'react-icons/md';
+import { FaMotorcycle, FaUserEdit } from 'react-icons/fa';
 import { NavLink, Outlet } from 'react-router';
 import TrustedLogo from '../Components/TrustedLogo';
 import './Dashboard.css'
@@ -68,6 +68,16 @@ const DashBoardLayout = () => {
                     <li>
                         <NavLink to="/dashboard/profile">
                             <FaUserEdit className="inline mr-2" /> Update Profile
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink to="/dashboard/pendingrider">
+                            <MdPendingActions className="inline mr-2" /> Pending Riders
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink to="/dashboard/activerider">
+                            <FaMotorcycle className="inline mr-2" /> Active Riders
                         </NavLink>
                     </li>
                 </ul>

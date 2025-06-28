@@ -19,7 +19,12 @@ const Header = () => {
 
     const links = <>
         <li><NavLink to='/'>Home</NavLink></li>
-        <li><NavLink to='/sendparcel'>Add Parcel</NavLink></li>
+        {
+            user && <>
+            <li><NavLink to='/sendparcel'>Add Parcel</NavLink></li>
+            <li><NavLink to='/berider'>Be A Rider</NavLink></li>           
+            </>
+        }
         <li><NavLink to='/coverage'>Coverage</NavLink></li>
         <li><NavLink to='/about'>About Us</NavLink></li>
 

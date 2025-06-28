@@ -4,16 +4,21 @@ import { Link, useLocation, useNavigate } from 'react-router';
 import UseAuth from '../../../Context/Hook/UseAuth';
 import Swal from 'sweetalert2';
 import axios from 'axios';
+import useAxios from '../../../Context/Hook/useAxios';
 
 const Register = () => {
     const { createUser, updateUser } = UseAuth()
     const [profile, setProfile] = useState('')
+    const axiosInstance = useAxios()
 
     const location = useLocation()
     const navigate = useNavigate()
     const from = location.state || '/'
 
-    const { register, handleSubmit, formState: { errors } } = useForm()
+    const { register,
+         handleSubmit,
+          formState: { errors } 
+        } = useForm()
 
     const onSubmit = info => {
         const email = info.email
@@ -22,13 +27,26 @@ const Register = () => {
         const photo = profile
 
         createUser(email, password)
-            .then(result => {
+            .then(async(result) => {
                 const emailHolder = result.user
+
+                  const userInfo = {
+                    email: email,
+                    role: 'user',
+                    created_at: new Date().toISOString(),
+                    last_log_at: new Date().toISOString()
+                }
+
+                const userRes =await axiosInstance.post('/users', userInfo)
+                console.log(userRes);
+
+
                 const updatedfile = {
                     ...emailHolder,
                     displayName: name,
                     photoURL: photo
                 }
+
                 updateUser(updatedfile)
                 .then(() => {
                         Swal.fire({
@@ -55,7 +73,6 @@ const Register = () => {
         // console.log(photo);
         const formData = new FormData()
         formData.append('image', photo)
-        console.log(formData);
         const res =await axios.post(`https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_API_KEY}`,formData)
         setProfile(res.data.data.display_url);
     }
